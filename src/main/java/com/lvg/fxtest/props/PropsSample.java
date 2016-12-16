@@ -8,9 +8,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import org.apache.log4j.Logger;
 
-/**
- * Created by Victor Levchenko LVG Corp. on 14.12.16.
- */
+
 public class PropsSample {
     private static final Logger LOGGER = Logger.getLogger(PropsSample.class);
 
@@ -33,7 +31,6 @@ public class PropsSample {
         x.set(200);
         LOGGER.info("Boolean binding x == y is: "+booleanBinding.get());
 
-        IntegerProperty num = new SimpleIntegerProperty(10);
         StringBinding stringBinding = new When(x.isEqualTo(y)).then("Equal").otherwise("Not equal");
         LOGGER.info("Boolean binding x == y is: "+stringBinding.get());
 

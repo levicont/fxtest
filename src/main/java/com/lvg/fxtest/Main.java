@@ -6,9 +6,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 
-/**
- * Created by Victor Levchenko LVG Corp. on 14.12.16.
- */
+
 public class Main extends Application{
     private static final Logger LOG = Logger.getLogger(Main.class);
     private VBox root;
