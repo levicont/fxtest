@@ -2,6 +2,7 @@ package com.lvg.fxtest.pdf;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -40,6 +41,5 @@ public class PdfViwerSample extends Application {
 
     @Override
     public void init() throws Exception {
-
     }
 }
