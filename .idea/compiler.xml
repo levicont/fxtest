@@ -23,7 +23,6 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="fxtest" />
-        <module name="fxtest (1)" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -32,4 +31,3 @@
     </bytecodeTargetLevel>
   </component>
 </project>
-
