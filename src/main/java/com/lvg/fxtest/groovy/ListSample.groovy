@@ -23,3 +23,18 @@ kings.sort{a,b -> b[0] <=> a[0]} // Revers sort by firs char
 assert kings == ['Paul', 'Dierk']
 
 
+def quickSortList(list){
+    if(list.size() < 2) return list
+
+    def pivot = list[list.size().intdiv(2)]
+    def left = list.findAll(){item -> item < pivot}
+    def middle = list.findAll(){item -> item == pivot}
+    def right = list.findAll(){item -> item > pivot}
+
+    return quickSortList(left) + middle + quickSortList(right)
+}
+
+assert [] == quickSortList([])
+assert [1] == quickSortList([1])
+assert [1,2] == quickSortList([2,1])
+assert [1,2,3] == quickSortList([1,3,2])
