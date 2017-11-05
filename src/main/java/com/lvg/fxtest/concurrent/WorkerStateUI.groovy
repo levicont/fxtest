@@ -1,6 +1,8 @@
 package com.lvg.fxtest.concurrent
 
 import javafx.beans.binding.When
+import javafx.beans.value.ChangeListener
+import javafx.beans.value.ObservableValue
 import javafx.collections.ObservableList
 import javafx.concurrent.Worker
 import javafx.scene.control.Label
@@ -55,19 +57,22 @@ class WorkerStateUI extends GridPane{
         message.textProperty().bind(worker.messageProperty())
         running.textProperty().bind(worker.runningProperty().asString())
         state.textProperty().bind(worker.stateProperty().asString())
-        totalWork.textProperty().bind(new When(worker.workDoneProperty().isEqualTo(-1))
-                                                .then('Unknow')
-                                                .otherwise(worker.workDoneProperty().asString()))
+        totalWork.textProperty().bind(new When(worker.totalWorkProperty().isEqualTo(-1))
+                                                .then('Unknown')
+                                                .otherwise(worker.totalWorkProperty().asString()))
+        workDone.textProperty().bind(new When(worker.workDoneProperty().isEqualTo(-1))
+                .then('Unknown')
+                .otherwise(worker.workDoneProperty().asString()))
         progress.textProperty().bind(new When(worker.progressProperty().isEqualTo(-1))
-                .then('Unknow')
+                .then('Unknown')
                 .otherwise((worker.progressProperty() * 100.0).asString('%.2f%%')))
         progressBar.progressProperty().bind(worker.progressProperty())
         value.textProperty().bind(worker.valueProperty().asString())
 
-        worker.exceptionProperty().addListener({prop, oldValue, newValue ->
-            if(newValue != null)
-                exception.text = newValue.message
-            else exception.text = ''
+        worker.exceptionProperty().addListener((ChangeListener){prop, oldValue, Throwable newValue ->
+                if(newValue != null)
+                    exception.setText(newValue.message)
+                else exception.text = ''
         })
 
     }

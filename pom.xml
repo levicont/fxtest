@@ -32,17 +32,8 @@
             <groupId>org.twitter4j</groupId>
             <artifactId>twitter4j-core</artifactId>
             <version>4.0.4</version>
-        </dependency>
-        <!-- GROOVY -->
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>2.4.7</version>
-        </dependency>
-
-
-
-    </dependencies>
+        </dependency>  
+           </dependencies>
 
     <build>
         <plugins>
