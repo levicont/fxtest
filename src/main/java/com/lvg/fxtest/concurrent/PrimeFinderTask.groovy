@@ -36,7 +36,7 @@ class PrimeFinderTask extends Task<ObservableList<Long>>{
     @Override
     protected void failed() {
         super.failed()
-        updateMessage('The task failed')
+        updateMessage('The task failed!')
     }
 
     @Override
