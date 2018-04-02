@@ -85,11 +85,11 @@ class WelderEditorPane extends GridPane{
         cbOrganization.setEditable(true)
         cbOrganization.valueProperty().addListener(new ChangeListener<OrganizationDTO>() {
             private final int COUNTER = listenersCounter+1
-
+            private int calledCounter = 0
             @Override
             void changed(ObservableValue<? extends OrganizationDTO> observable,
                          OrganizationDTO oldValue, OrganizationDTO newValue) {
-                LOGGER.debug("cbOrganization ChangeValueListener: value changed ")
+                LOGGER.debug("cbOrganization ChangeValueListener: value changed, calling: ${++calledCounter} time")
                 LOGGER.debug("cbOrganization ChangeValueListener: COUNTER:  "+ COUNTER)
                 //	LOGGER.debug("cbOrganization ChangeValueListener: listener: " + this.getClass().getName());
                 //	LOGGER.debug("cbOrganization ChangeValueListener: new value is:" + newValue);
@@ -149,7 +149,7 @@ class WelderEditorPane extends GridPane{
         txfName.textProperty().bindBidirectional(welderDTO.nameProperty())
         txfPhone.textProperty().bindBidirectional(welderDTO.phoneProperty())
         dpBirthday.valueProperty().bindBidirectional(welderDTO.birthdayProperty())
-        cbOrganization.valueProperty().bindBidirectional(welderDTO.organizationDTOProperty());
+        //cbOrganization.valueProperty().bindBidirectional(welderDTO.organizationDTOProperty());
         LOGGER.debug("WelderEditorPane.bind(): END")
     }
 
@@ -157,7 +157,7 @@ class WelderEditorPane extends GridPane{
         welderDTO.birthdayProperty().unbindBidirectional(dpBirthday.valueProperty())
         welderDTO.nameProperty().unbindBidirectional(txfName.textProperty())
         welderDTO.phoneProperty().unbindBidirectional(txfPhone.textProperty())
-        welderDTO.organizationDTOProperty().unbindBidirectional(cbOrganization.valueProperty());
+        //welderDTO.organizationDTOProperty().unbindBidirectional(cbOrganization.valueProperty());
     }
 
     void setWelderDTO(WelderDTO welderDTO){

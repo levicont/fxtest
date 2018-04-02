@@ -3,17 +3,22 @@ package com.lvg.fxtest.tablepane
 import com.lvg.fxtest.tablepane.dto.OrganizationDTO
 import com.lvg.fxtest.tablepane.models.Organization
 import javafx.util.StringConverter
+import org.apache.log4j.Logger
 
 class OrganizationConverter extends StringConverter<OrganizationDTO> {
+    private static final Logger LOGGER = Logger.getLogger(OrganizationConverter.class)
+
 
     @Override
     OrganizationDTO fromString(String string) {
-
-        Organization org = Organization.getOrganization()
-        if (string == null){return new OrganizationDTO(org)
+        LOGGER.debug("OrganizationConverter fromString() called: string: ${string}")
+        if (string == null){return getDefaultOrganizationDTO()
         }
-        org.setName(string)
-        return new OrganizationDTO(org)
+
+        OrganizationDTO result = getDefaultOrganizationDTO()
+        result.nameProperty().set(string)
+        LOGGER.debug("OrganizationConverter fromString() called: result: ${result}")
+        return result
     }
 
     @Override
@@ -22,6 +27,12 @@ class OrganizationConverter extends StringConverter<OrganizationDTO> {
             return "none"
         }
         return object.nameProperty().get()
+    }
+
+    private static OrganizationDTO getDefaultOrganizationDTO(){
+        OrganizationDTO result = new OrganizationDTO(Organization.getOrganization())
+        result.idProperty().set(0)
+        return result
     }
 
 }
