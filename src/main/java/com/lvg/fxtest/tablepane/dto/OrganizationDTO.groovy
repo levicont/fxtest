@@ -7,7 +7,7 @@ import javafx.beans.property.SimpleLongProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
-import org.apache.log4j.Logger
+
 
 class OrganizationDTO extends GenericDTO{
     private final LongProperty idProperty = new SimpleLongProperty()

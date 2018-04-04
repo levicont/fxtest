@@ -15,8 +15,23 @@ class OrganizationConverter extends StringConverter<OrganizationDTO> {
         if (string == null){return getDefaultOrganizationDTO()
         }
 
-        OrganizationDTO result = getDefaultOrganizationDTO()
-        result.nameProperty().set(string)
+
+        OrganizationDTO result = null
+
+        WelderRepository.organizationDTOListProperty().stream().forEach({organizationDTO ->
+            if (string.toLowerCase() == organizationDTO.nameProperty().get().toLowerCase()) {
+                result = organizationDTO
+                LOGGER.debug("OrganizationConverter fromString() called: string has found in repository, result is: ${result}")
+            }
+
+        })
+
+        if (null == result) {
+            result = getDefaultOrganizationDTO()
+            result.nameProperty().set(string)
+        }
+
+
         LOGGER.debug("OrganizationConverter fromString() called: result: ${result}")
         return result
     }

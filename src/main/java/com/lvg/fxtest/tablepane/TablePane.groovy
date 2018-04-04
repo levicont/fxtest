@@ -56,7 +56,7 @@ class TablePane extends BorderPane{
 
         })
 
-        btLoad.setOnAction( {action -> WelderRepository.loadTableViewData() })
+        btLoad.setOnAction( {action -> WelderRepository.loadAllData()})
 
         centerProperty().set(table)
         rightProperty().set(fieldsPane)

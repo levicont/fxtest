@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
+import javafx.collections.transformation.FilteredList
 import javafx.scene.control.ComboBox
 import javafx.scene.control.DatePicker
 import javafx.scene.control.Label
@@ -15,6 +16,8 @@ import javafx.scene.control.TextField
 import javafx.scene.layout.GridPane
 import javafx.util.StringConverter
 import org.apache.log4j.Logger
+
+import java.util.function.Predicate
 
 class WelderEditorPane extends GridPane{
     private static final Logger LOGGER = Logger.getLogger(WelderEditorPane.class)
@@ -83,13 +86,14 @@ class WelderEditorPane extends GridPane{
     private void initCBOrganization(){
         cbOrganization.setConverter(new OrganizationConverter())
         cbOrganization.setEditable(true)
+        cbOrganization.setItems(WelderRepository.organizationDTOListProperty())
         cbOrganization.valueProperty().addListener(new ChangeListener<OrganizationDTO>() {
             private final int COUNTER = listenersCounter+1
             private int calledCounter = 0
             @Override
             void changed(ObservableValue<? extends OrganizationDTO> observable,
                          OrganizationDTO oldValue, OrganizationDTO newValue) {
-                LOGGER.debug("cbOrganization ChangeValueListener: value changed, calling: ${++calledCounter} time")
+                LOGGER.debug("cbOrganization ChangeValueListener: value changed, calling: ${++calledCounter} times")
                 LOGGER.debug("cbOrganization ChangeValueListener: COUNTER:  "+ COUNTER)
                 //	LOGGER.debug("cbOrganization ChangeValueListener: listener: " + this.getClass().getName());
                 //	LOGGER.debug("cbOrganization ChangeValueListener: new value is:" + newValue);
@@ -100,46 +104,29 @@ class WelderEditorPane extends GridPane{
             }
 
         })
-
-        /*cbOrganization.addEventHandler(Event.ANY, new EventHandler<Event>() {
-
+        cbOrganization.editorProperty().get().textProperty().addListener(new ChangeListener<String>() {
             @Override
-            public void handle(Event event) {
-                if (event.getEventType() == ActionEvent.ACTION ){
-                    LOGGER.debug("cbOrganization ActionEvent: event occurs ACTION type: "+event.getEventType());
-                    event.consume();
-                    cbOrganization.valueProperty().set(null);
+            void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                if (!cbOrganization.editorProperty().get().isFocused())
+                    return
+                FilteredList<OrganizationDTO> list = (FilteredList<OrganizationDTO>)cbOrganization.getItems()
+                if (newValue == null || newValue.isEmpty()){
+                   list.setPredicate({true})
+                }else{
+                    list.setPredicate({ org ->
+                        return org.nameProperty().get().toLowerCase().contains(newValue.toLowerCase())
+                    })
+
+
                 }
-                LOGGER.debug("cbOrganization ActionEvent: event occurs type: "+event.getEventType());
+
+                cbOrganization.visibleRowCountProperty().set(10)
+                cbOrganization.show()
 
             }
+        })
 
-        });
-        */
-        /*cbOrganization.valueProperty().addListener(new InvalidationListener() {
 
-            @Override
-            public void invalidated(Observable observable) {
-                LOGGER.debug("cbOrganization IvalidatedValueListener: value changed ");
-                LOGGER.debug("cbOrganization IvalidatedValueListener: new value is:" +
-                                ((ObjectProperty<OrganizationDTO>)observable).get());
-                LOGGER.debug("cbOrganization IvalidatedValueListener: items is:" + cbOrganization.getItems());
-
-            }
-        });*/
-
-        /*cbOrganization.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<OrganizationDTO>() {
-
-            @Override
-            public void changed(ObservableValue<? extends OrganizationDTO> observable,
-                    OrganizationDTO oldValue, OrganizationDTO newValue) {
-                LOGGER.debug("cbOrganization ChangeSelectedItemListener: value changed ");
-                LOGGER.debug("cbOrganization ChangeSelectedItemListener: new value is:" + newValue);
-                LOGGER.debug("cbOrganization ChangeSelectedItemListener: items is:" + cbOrganization.getItems());
-
-            }
-
-        });*/
     }
 
     private void bind(){
@@ -149,7 +136,7 @@ class WelderEditorPane extends GridPane{
         txfName.textProperty().bindBidirectional(welderDTO.nameProperty())
         txfPhone.textProperty().bindBidirectional(welderDTO.phoneProperty())
         dpBirthday.valueProperty().bindBidirectional(welderDTO.birthdayProperty())
-        //cbOrganization.valueProperty().bindBidirectional(welderDTO.organizationDTOProperty());
+        cbOrganization.valueProperty().bindBidirectional(welderDTO.organizationDTOProperty())
         LOGGER.debug("WelderEditorPane.bind(): END")
     }
 
@@ -157,7 +144,7 @@ class WelderEditorPane extends GridPane{
         welderDTO.birthdayProperty().unbindBidirectional(dpBirthday.valueProperty())
         welderDTO.nameProperty().unbindBidirectional(txfName.textProperty())
         welderDTO.phoneProperty().unbindBidirectional(txfPhone.textProperty())
-        //welderDTO.organizationDTOProperty().unbindBidirectional(cbOrganization.valueProperty());
+        welderDTO.organizationDTOProperty().unbindBidirectional(cbOrganization.valueProperty())
     }
 
     void setWelderDTO(WelderDTO welderDTO){
