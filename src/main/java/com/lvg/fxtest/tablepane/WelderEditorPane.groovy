@@ -17,7 +17,6 @@ import javafx.scene.layout.GridPane
 import javafx.util.StringConverter
 import org.apache.log4j.Logger
 
-import java.util.function.Predicate
 
 class WelderEditorPane extends GridPane{
     private static final Logger LOGGER = Logger.getLogger(WelderEditorPane.class)
@@ -86,6 +85,7 @@ class WelderEditorPane extends GridPane{
     private void initCBOrganization(){
         cbOrganization.setConverter(new OrganizationConverter())
         cbOrganization.setEditable(true)
+        cbOrganization.visibleRowCountProperty().set(10)
         cbOrganization.setItems(WelderRepository.organizationDTOListProperty())
         cbOrganization.valueProperty().addListener(new ChangeListener<OrganizationDTO>() {
             private final int COUNTER = listenersCounter+1
@@ -120,7 +120,7 @@ class WelderEditorPane extends GridPane{
 
                 }
 
-                cbOrganization.visibleRowCountProperty().set(10)
+
                 cbOrganization.show()
 
             }
@@ -154,9 +154,6 @@ class WelderEditorPane extends GridPane{
         bind()
     }
 
-    WelderDTO getWelderDTO(){
-        return this.welderDTO
-    }
 
     private class Title{
 
