@@ -13,7 +13,6 @@ import com.sun.star.sheet.XSpreadsheetDocument;
 import com.sun.star.sheet.XSpreadsheetView;
 import com.sun.star.sheet.XSpreadsheets;
 import com.sun.star.table.XCell;
-import com.sun.star.uno.Type;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
@@ -27,7 +26,45 @@ public class FirstUnoContact {
     private static final String BLANK_STR = "_blank";
     private static final String DEFAULT_SHEET_NAME = "MySheet";
 
+    private XComponent xSpreadsheetComponent;
+
+
+
     public static void main(String[] args) {
+        FirstUnoContact fuc = new FirstUnoContact();
+        try{
+            
+            XSpreadsheet xSpreadsheet = fuc.getSpreadSheetByURLAndName(SPREADSHEET_DOC_URL,DEFAULT_SHEET_NAME);
+            XCell xCell = xSpreadsheet.getCellByPosition(0, 0);
+            xCell.setValue(24);
+
+            xCell = xSpreadsheet.getCellByPosition(0, 1);
+            xCell.setValue(21);
+            xCell = xSpreadsheet.getCellByPosition(0, 2);
+            xCell.setFormula("=sum(A1:A2)");
+
+            XPropertySet xCellProps = (XPropertySet)UnoRuntime.queryInterface(
+                    XPropertySet.class, xCell);
+            xCellProps.setPropertyValue("CellStyle", "Result");
+
+            XModel xSpreadsheetModel = (XModel)UnoRuntime.queryInterface(
+                    XModel.class, fuc.xSpreadsheetComponent);
+            XController xSpreadsheetController = xSpreadsheetModel.getCurrentController();
+            XSpreadsheetView xSpreadsheetView = (XSpreadsheetView)
+                    UnoRuntime.queryInterface(XSpreadsheetView.class,
+                            xSpreadsheetController);
+            xSpreadsheetView.setActiveSheet(xSpreadsheet);
+
+
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        finally {
+            System.exit(0);
+        }
+    }
+
+    private XSpreadsheet getSpreadSheetByURLAndName(String url, String spreadsheetName){
         try{
             XComponentContext xRemoteContext = Bootstrap.bootstrap();
             if (xRemoteContext == null) {
@@ -43,45 +80,19 @@ public class FirstUnoContact {
             XComponentLoader xComponentLoader = (XComponentLoader)
                     UnoRuntime.queryInterface(XComponentLoader.class,desktop);
             PropertyValue[] loadProps = new PropertyValue[0];
-            XComponent xSpreadsheetComponent =
-                    xComponentLoader.loadComponentFromURL(SPREADSHEET_DOC_URL,BLANK_STR,0,loadProps);
+            this.xSpreadsheetComponent =
+                    xComponentLoader.loadComponentFromURL(url,BLANK_STR,0,loadProps);
             XSpreadsheetDocument xSpreadsheetDocument = (XSpreadsheetDocument)
                     UnoRuntime.queryInterface(XSpreadsheetDocument.class, xSpreadsheetComponent);
             XSpreadsheets xSpreadsheets = xSpreadsheetDocument.getSheets();
-//            xSpreadsheets.insertNewByName(DEFAULT_SHEET_NAME, (short)0);
-
-            Type elementType = xSpreadsheets.getElementType();
-            System.out.println("Element type: "+ elementType.getTypeName());
-
-            Object sheet = xSpreadsheets.getByName(DEFAULT_SHEET_NAME);
+           
+            Object sheet = xSpreadsheets.getByName(spreadsheetName);
             XSpreadsheet xSpreadsheet = (XSpreadsheet)
                     UnoRuntime.queryInterface(XSpreadsheet.class,sheet);
-            XCell xCell = xSpreadsheet.getCellByPosition(0, 0);
-            //xCell.setValue(24);
-
-            xCell = xSpreadsheet.getCellByPosition(0, 1);
-           // xCell.setValue(21);
-            xCell = xSpreadsheet.getCellByPosition(0, 2);
-           // xCell.setFormula("=sum(A1:A2)");
-
-            XPropertySet xCellProps = (XPropertySet)UnoRuntime.queryInterface(
-                    XPropertySet.class, xCell);
-            xCellProps.setPropertyValue("CellStyle", "Result");
-
-            XModel xSpreadsheetModel = (XModel)UnoRuntime.queryInterface(
-                    XModel.class, xSpreadsheetComponent);
-            XController xSpreadsheetController = xSpreadsheetModel.getCurrentController();
-            XSpreadsheetView xSpreadsheetView = (XSpreadsheetView)
-                    UnoRuntime.queryInterface(XSpreadsheetView.class,
-                            xSpreadsheetController);
-            xSpreadsheetView.setActiveSheet(xSpreadsheet);
-
-
-        }catch (Exception ex){
+            return xSpreadsheet;
+        }catch(Exception ex){
             ex.printStackTrace();
-        }
-        finally {
-            System.exit(0);
+            throw new RuntimeException(ex);
         }
     }
 }
