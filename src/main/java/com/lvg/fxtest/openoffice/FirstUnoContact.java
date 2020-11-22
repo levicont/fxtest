@@ -16,6 +16,8 @@ import com.sun.star.table.XCell;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
+import java.time.LocalDate;
+
 /**
  * Created by Victor Levchenko LVG Corp. on 15.11.2020.
  */
@@ -34,7 +36,7 @@ public class FirstUnoContact {
         FirstUnoContact fuc = new FirstUnoContact();
         try{
             
-            XSpreadsheet xSpreadsheet = fuc.getSpreadSheetByURLAndName(SPREADSHEET_DOC_URL,DEFAULT_SHEET_NAME);
+            XSpreadsheet xSpreadsheet = fuc.getSpreadSheetByURLAndName(SPREADSHEET_DOC_URL,DEFAULT_SHEET_NAME,new PropertyValue[0]);
             XCell xCell = xSpreadsheet.getCellByPosition(0, 0);
             xCell.setValue(24);
 
@@ -55,16 +57,29 @@ public class FirstUnoContact {
                             xSpreadsheetController);
             xSpreadsheetView.setActiveSheet(xSpreadsheet);
 
+            fuc.getDataFromXlsx("");
+
 
         }catch (Exception ex){
             ex.printStackTrace();
         }
         finally {
-            System.exit(0);
+           // System.exit(0);
         }
     }
 
-    private XSpreadsheet getSpreadSheetByURLAndName(String url, String spreadsheetName){
+    private XSpreadsheet getSpreadSheetByURLAndName(String url, String spreadsheetName, PropertyValue[] propertyValues){
+        try{
+            XSpreadsheets xSpreadsheets = getXSpreadsheetDocumentByURL(url, propertyValues).getSheets();
+            Object sheet = xSpreadsheets.getByName(spreadsheetName);
+            return (XSpreadsheet)UnoRuntime.queryInterface(XSpreadsheet.class,sheet);
+        }catch(Exception ex){
+            ex.printStackTrace();
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private XSpreadsheetDocument getXSpreadsheetDocumentByURL(String url, PropertyValue[] propertyValues){
         try{
             XComponentContext xRemoteContext = Bootstrap.bootstrap();
             if (xRemoteContext == null) {
@@ -79,20 +94,36 @@ public class FirstUnoContact {
             Object desktop = xRemoteContextServiceManager.createInstanceWithContext(DESKTOP_SERVICE,xRemoteContext);
             XComponentLoader xComponentLoader = (XComponentLoader)
                     UnoRuntime.queryInterface(XComponentLoader.class,desktop);
-            PropertyValue[] loadProps = new PropertyValue[0];
             this.xSpreadsheetComponent =
-                    xComponentLoader.loadComponentFromURL(url,BLANK_STR,0,loadProps);
+                    xComponentLoader.loadComponentFromURL(url,BLANK_STR,0,propertyValues);
             XSpreadsheetDocument xSpreadsheetDocument = (XSpreadsheetDocument)
                     UnoRuntime.queryInterface(XSpreadsheetDocument.class, xSpreadsheetComponent);
-            XSpreadsheets xSpreadsheets = xSpreadsheetDocument.getSheets();
-           
-            Object sheet = xSpreadsheets.getByName(spreadsheetName);
-            XSpreadsheet xSpreadsheet = (XSpreadsheet)
-                    UnoRuntime.queryInterface(XSpreadsheet.class,sheet);
-            return xSpreadsheet;
-        }catch(Exception ex){
-            ex.printStackTrace();
+            return xSpreadsheetDocument;
+        }catch (Exception ex){
             throw new RuntimeException(ex);
+        }
+    }
+
+    private void getDataFromXlsx(String path){
+        PropertyValue[] propertyValues = new PropertyValue[1];
+        propertyValues[0] = new PropertyValue();
+        propertyValues[0].Name = "Hidden";
+        propertyValues[0].Value = Boolean.TRUE;
+        try{
+            XSpreadsheet xSpreadsheet =
+                    getSpreadSheetByURLAndName("file:///home/lvg/tmp/openoffice-test/Сводная таблица отгрузок.xlsx",
+                            "Ноябрь", propertyValues);
+            XCell xCell = xSpreadsheet.getCellByPosition(2,2);
+            System.out.println("Date is: " + xCell.getValue());
+            LocalDate startDate = LocalDate.of(1899,12,30);
+            System.out.println("Start date is: " + startDate);
+            LocalDate currentDate = startDate.plusDays((long)xCell.getValue());
+            System.out.println("Current date is: "+ currentDate);
+            System.out.print(LocalDate.ofEpochDay((long)xCell.getValue()).getDayOfMonth());
+            System.out.print("."+LocalDate.ofEpochDay((long)xCell.getValue()).getMonth());
+            System.out.println("."+ LocalDate.ofEpochDay((long)xCell.getValue()).getYear());
+        }catch (Exception ex){
+            ex.printStackTrace();
         }
     }
 }
